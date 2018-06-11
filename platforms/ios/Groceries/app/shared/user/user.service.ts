@@ -11,8 +11,30 @@ import { Config } from "../config";
 @Injectable()
 export class UserService {
   constructor(private http: Http){}
-  
+
   register(user: User) {
-    alert("Going to register: " + user.email);
+    return this.http.post(
+      Config.apiUrl + "user/" + Config.appKey,
+      JSON.stringify({
+        username: user.email,
+        email: user.email,
+        password: user.password
+      }),
+      { headers: this.getCommonHeaders() }
+    )
+    .catch(this.handleErrors);
+  }
+
+  getCommonHeaders() {
+    let headers = new Headers();
+    
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", Config.authHeader);
+    return headers;
+  }
+
+  handleErrors(error: Response){
+    console.log(JSON.stringify(error.json()));
+    return Observable.throw(error);
   }
 }
